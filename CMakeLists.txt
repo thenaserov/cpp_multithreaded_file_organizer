@@ -5,4 +5,6 @@ project(cpp_multithreaded_folder_organizer LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(cpp_multithreaded_folder_organizer main.cpp)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+
+add_executable(mamamia main.cpp)

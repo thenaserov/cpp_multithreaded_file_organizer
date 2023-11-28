@@ -3,6 +3,7 @@
 #include <thread>
 #include <vector>
 #include <mutex>
+#include <string>
 
 const std::string PICTURES_FOLDER = "Pictures";
 const std::string VIDEOS_FOLDER   = "Videos";
@@ -10,6 +11,22 @@ const std::string MUSIC_FOLDER    = "Music";
 const std::string OTHERS_FOLDER   = "Others";
 
 std::mutex mtx;
+
+void organize(const std::filesystem::path& sourceDir, std::string extention)
+{
+   std::filesystem::path Dir = sourceDir / extention;
+
+   std::filesystem::create_directory(Dir);
+
+   for (const auto& file : std::filesystem::directory_iterator(sourceDir))
+   {
+      if (file.path().extension() == extention)
+      {
+         std::lock_guard<std::mutex> lock(mtx);
+         std::filesystem::rename(file.path(), Dir / file.path().filename());
+      }
+   }
+}
 
 void organizePictures(const std::filesystem::path& sourceDir)
 {
@@ -79,21 +96,19 @@ void organizeOthers(const std::filesystem::path& sourceDir)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
-   std::filesystem::path sourceDir = std::filesystem::current_path();   // Use current directory as the source directory
 
-   std::thread t1(organizePictures, sourceDir);
-   std::thread t2(organizeVideos, sourceDir);
-   std::thread t3(organizeMusic, sourceDir);
-   std::thread t4(organizeOthers, sourceDir);
+    std::filesystem::path sourceDir = std::filesystem::current_path();   // Use current directory as the source directory
+    std::thread t1(organize, sourceDir, argv[1]);
 
-   t1.join();
-   t2.join();
-   t3.join();
-   t4.join();
 
-   std::cout << "Organizing completed successfully!" << std::endl;
+    t1.join();
+
+
+    std::cout << "Organizing completed successfully!" << std::endl;
+
+
 
    return 0;
 }
