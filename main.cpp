@@ -62,16 +62,13 @@ void organizeVideos(const std::filesystem::path& sourceDir)
 }
 
 
-void organizeMusic(const std::filesystem::path& sourceDir)
-{
+void organizeMusic(const std::filesystem::path& sourceDir) {
    std::filesystem::path musicDir = sourceDir / MUSIC_FOLDER;
-
    std::filesystem::create_directory(musicDir);
 
    for (const auto& file : std::filesystem::directory_iterator(sourceDir))
    {
-      if ((file.path().extension() == ".mp3") || (file.path().extension() == ".wav"))
-      {
+      if ((file.path().extension() == ".mp3") || (file.path().extension() == ".wav")){
          std::lock_guard<std::mutex> lock(mtx);
          std::filesystem::rename(file.path(), musicDir / file.path().filename());
       }
@@ -79,16 +76,12 @@ void organizeMusic(const std::filesystem::path& sourceDir)
 }
 
 
-void organizeOthers(const std::filesystem::path& sourceDir)
-{
+void organizeOthers(const std::filesystem::path& sourceDir) {
    std::filesystem::path othersDir = sourceDir / OTHERS_FOLDER;
-
    std::filesystem::create_directory(othersDir);
 
-   for (const auto& file : std::filesystem::directory_iterator(sourceDir))
-   {
-      if (file.is_regular_file())
-      {
+   for (const auto& file : std::filesystem::directory_iterator(sourceDir)) {
+      if (file.is_regular_file()) {
          std::lock_guard<std::mutex> lock(mtx);
          std::filesystem::rename(file.path(), othersDir / file.path().filename());
       }
@@ -96,19 +89,10 @@ void organizeOthers(const std::filesystem::path& sourceDir)
 }
 
 
-int main(int argc, char* argv[])
-{
-
-    std::filesystem::path sourceDir = std::filesystem::current_path();   // Use current directory as the source directory
-    std::thread t1(organize, sourceDir, argv[1]);
-
-
-    t1.join();
-
-
-    std::cout << "Organizing completed successfully!" << std::endl;
-
-
-
+int main(int argc, char* argv[]) {
+   std::filesystem::path sourceDir = std::filesystem::current_path();   // Use current directory as the source directory
+   std::thread t1(organize, sourceDir, argv[1]);
+   t1.join();
+   std::cout << "Organizing completed successfully!" << std::endl;
    return 0;
 }
