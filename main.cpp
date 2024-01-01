@@ -15,7 +15,6 @@ std::mutex mtx;
 void organize(const std::filesystem::path& sourceDir, std::string extention)
 {
    std::filesystem::path Dir = sourceDir / extention;
-
    std::filesystem::create_directory(Dir);
 
    for (const auto& file : std::filesystem::directory_iterator(sourceDir))
@@ -31,7 +30,6 @@ void organize(const std::filesystem::path& sourceDir, std::string extention)
 void organizePictures(const std::filesystem::path& sourceDir)
 {
    std::filesystem::path picturesDir = sourceDir / PICTURES_FOLDER;
-
    std::filesystem::create_directory(picturesDir);
 
    for (const auto& file : std::filesystem::directory_iterator(sourceDir))
@@ -48,7 +46,6 @@ void organizePictures(const std::filesystem::path& sourceDir)
 void organizeVideos(const std::filesystem::path& sourceDir)
 {
    std::filesystem::path videosDir = sourceDir / VIDEOS_FOLDER;
-
    std::filesystem::create_directory(videosDir);
 
    for (const auto& file : std::filesystem::directory_iterator(sourceDir))
@@ -81,7 +78,7 @@ void organizeOthers(const std::filesystem::path& sourceDir) {
    std::filesystem::create_directory(othersDir);
 
    for (const auto& file : std::filesystem::directory_iterator(sourceDir)) {
-      if (file.is_regular_file()) {
+      if (file.is_regular_file() && file.path() != "mamamia.exe") {
          std::lock_guard<std::mutex> lock(mtx);
          std::filesystem::rename(file.path(), othersDir / file.path().filename());
       }
@@ -89,7 +86,13 @@ void organizeOthers(const std::filesystem::path& sourceDir) {
 }
 
 
+// Usage : 
 int main(int argc, char* argv[]) {
+    if (argc < 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " .extension" << std::endl;
+        return 1;
+    }
    std::filesystem::path sourceDir = std::filesystem::current_path();   // Use current directory as the source directory
    std::thread t1(organize, sourceDir, argv[1]);
    t1.join();
